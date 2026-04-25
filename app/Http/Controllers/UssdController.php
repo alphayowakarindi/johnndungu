@@ -17,7 +17,7 @@ class UssdController extends Controller
         // SCREEN 1: Welcome & Intro
         if ($level == 0) {
             $response = "CON Welcome, my name is John Ndung'u Kamau, a young aspiring MP for Roysambu constituency.\n\n";
-            $response .= "Ni JONTEH FRESH na IDEAS FRESH za Roysambu\n\n";
+            $response .= "Ni JONTEH FRESH na IDEAS FRESH za Roysambu FRESH.\n\n";
             $response .= "1. Next";
         }
 
@@ -26,7 +26,6 @@ class UssdController extends Controller
         elseif ($level == 1 && $details[0] == "1" || end($details) === "0") {
             $response = "CON 1. Education — Online bursary application\n";
             $response .= "2. Health — RoysAfya care\n";
-            $response .= "3. Reporting an issue";
         }
 
         // --- BRANCH 1: EDUCATION ---
@@ -70,37 +69,19 @@ class UssdController extends Controller
                 }
             } elseif ($level == 4 && $details[2] == "3") {
                 $name = end($details);
+
+                // If name is empty, we just call them "supporter" or "voter"
+                $displayName = empty($name) ? "valued supporter" : $name;
+
                 Voter::updateOrCreate(
                     ['phone' => $phoneNumber],
                     [
-                        'name' => $name,
-                        'session_id' => $request->input('sessionId') // Grabbed from Wasiliana's request
+                        'name' => $name, // Saves as null or empty string
+                        'session_id' => $request->input('sessionId')
                     ]
                 );
-                $response = "END Thank you $name! You have successfully registered.";
-            }
-        }
 
-        // --- BRANCH 3: REPORTING AN ISSUE ---
-        elseif ($level >= 2 && $details[1] == "3") {
-            if ($level == 2) {
-                $response = "CON Select an issue:\n";
-                $response .= "1. Street Lights\n2. Insecurity\n3. Illegal Dumping\n4. Water Leakage\n5. Noise Pollution\n6. Road & Drainage\n7. Others\n0. Back";
-            } elseif ($level == 3) {
-                $issueType = $details[2];
-                $issueLabels = ["1" => "Street Lights", "2" => "Insecurity", "3" => "Dumping", "4" => "Water", "5" => "Noise", "6" => "Roads"];
-
-                if ($issueType == "7") {
-                    $response = "CON Please describe the issue:";
-                } elseif (isset($issueLabels[$issueType])) {
-                    $label = $issueLabels[$issueType];
-                    $response = "END Thank you for reporting $label. Ideas Fresh!";
-                } else {
-                    $response = "CON Invalid choice.\n0. Back";
-                }
-            } elseif ($level == 4 && $details[2] == "7") {
-                $customIssue = end($details);
-                $response = "END Thank you. Your report on '$customIssue' has been submitted.";
+                $response = "END Thank you $displayName! You have successfully registered.";
             }
         }
 
@@ -108,7 +89,7 @@ class UssdController extends Controller
         else {
             // Instead of END, we show the Main Menu with an error
             $response = "CON Invalid selection. Please try again:\n";
-            $response .= "1. Education\n2. Health\n3. Reporting an issue";
+            $response .= "1. Education\n2. Health";
         }
 
         return response($response)->header('Content-Type', 'text/plain');
