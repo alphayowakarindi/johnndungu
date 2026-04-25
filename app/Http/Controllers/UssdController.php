@@ -9,87 +9,171 @@ class UssdController extends Controller
 {
     public function handle(Request $request)
     {
-        $text = $request->input('text');
+        // 1. Clean Input
+        $text = trim($request->input('text', ''));
         $phoneNumber = $request->input('phoneNumber');
-        $details = explode('*', $text);
-        $level = (empty($text)) ? 0 : count($details);
+        $sessionId = $request->input('sessionId');
 
-        // SCREEN 1: Welcome & Intro
+        // Normalize Wasiliana initial dial (2222)
+        if ($text === "2222") {
+            $text = "";
+        }
+
+        $details = !empty($text) ? explode('*', $text) : [];
+        $level = count($details);
+
+        $response = "";
+
+        // --- THE LOGIC ROUTER ---
+
+        // Level 0: Welcome Screen
         if ($level == 0) {
-            $response = "CON Welcome, my name is John Ndung'u Kamau, a young aspiring MP for Roysambu constituency.\n\n";
-            $response .= "Ni JONTEH FRESH na IDEAS FRESH za Roysambu FRESH.\n\n";
+            $response = "CON Welcome, my name is John Ndung'u Kamau, a young aspiring MP for Roysambu. Let's go digital!\n\n";
+            $response .= "Ni JONTEH FRESH na IDEAS FRESH za Roysambu Fresh.\n\n";
             $response .= "1. Next";
         }
 
-        // SCREEN 2: The Main Menu
-        // We check if the last thing they pressed was '0' (Back) to return them here
-        elseif ($level == 1 && $details[0] == "1" || end($details) === "0") {
-            $response = "CON 1. Education — Online bursary application\n";
-            $response .= "2. Health — RoysAfya care\n";
+        // Level 1: Main Menu (Reached via '1' from Welcome or '0' from submenus)
+        elseif (($level == 1 && $details[0] == "1") || (end($details) === "0" && $level > 0)) {
+            $response = "CON 1. Education - Online bursary application\n";
+            $response .= "2. Health - RoysAfya care\n";
         }
 
         // --- BRANCH 1: EDUCATION ---
         elseif ($level >= 2 && $details[1] == "1") {
-            // If they just arrived at Education menu
+
+            // LEVEL 2: Education Sub-Menu
             if ($level == 2) {
                 $response = "CON 1. Efficiency for parents\n";
                 $response .= "2. Transparency and Fairness\n";
                 $response .= "0. Back";
             }
-            // If they picked an Education sub-option
+
+            // LEVEL 3: PAGE 1 (First Bullet Point)
             elseif ($level == 3) {
                 $eduChoice = $details[2];
+
                 if ($eduChoice == "1") {
-                    $response = "CON * Saving Time: Parents won't have to miss work to stand in long queues.\n";
-                    $response .= "* 24/7 Accessibility: Apply from phones at any time.\n";
-                    $response .= "\n0. Back";
+                    // Your exact text: Saving Time
+                    $response = "CON Saving Time: Parents won't have to miss work or close their businesses to stand in long queues at a physical office.\n";
+                    $response .= "1. More\n0. Back";
                 } elseif ($eduChoice == "2") {
-                    $response = "CON * Eliminating Favoritism: Remove middlemen who give to friends.\n";
-                    $response .= "* Accountability: Clear digital trail prevents 'sale' of slots.\n";
-                    $response .= "\n0. Back";
+                    // Your exact text: Eliminating Favoritism
+                    $response = "CON Eliminating Favoritism: By using a digital system, you remove the middlemen who often give bursaries to friends or relatives.\n";
+                    $response .= "1. More\n0. Back";
                 } else {
-                    $response = "CON Invalid choice.\n0. Back to Education Menu";
+                    $response = "CON Invalid choice.\n0. Back";
+                }
+            }
+
+            // LEVEL 4: PAGE 2 (Second Bullet Point)
+            elseif ($level == 4) {
+                $eduChoice = $details[2];
+                $more1 = end($details);
+
+                if ($more1 == "1") {
+                    if ($eduChoice == "1") {
+                        // Your exact text: 24/7 Accessibility
+                        $response = "CON 24/7 Accessibility: They can apply from their phones at any time, even late at night after work.\n";
+                        $response .= "1. More\n0. Back";
+                    } elseif ($eduChoice == "2") {
+                        // Your exact text: Accountability
+                        $response = "CON Accountability: The system creates a clear digital trail of who applied, who qualified, and why, preventing the sale of bursary slots.\n";
+                        $response .= "1. More\n0. Back";
+                    }
+                } else {
+                    $response = "CON Invalid choice.\n0. Back";
+                }
+            }
+
+            // LEVEL 5: PAGE 3 (Third Bullet Point)
+            elseif ($level == 5) {
+                $eduChoice = $details[2];
+                $more2 = end($details);
+
+                if ($more2 == "1") {
+                    if ($eduChoice == "1") {
+                        // Your exact text: Status Tracking
+                        $response = "CON Status Tracking: Instead of wondering if their application was lost, parents can see the progress of their application in real-time.\n";
+                        $response .= "0. Back";
+                    } elseif ($eduChoice == "2") {
+                        // Your exact text: Reaching the Needy
+                        $response = "CON Reaching the Needy: It ensures that the funds actually reach those who need them most, rather than those with the best political connections.\n";
+                        $response .= "0. Back";
+                    }
+                } else {
+                    $response = "CON Invalid choice.\n0. Back";
                 }
             }
         }
 
-        // --- BRANCH 2: HEALTH ---
+        // Branch 2: Health
         elseif ($level >= 2 && $details[1] == "2") {
             if ($level == 2) {
                 $response = "CON Welcome to RoysAfya Care\n";
-                $response .= "1. Benefits Info\n2. Contribution (Ksh 1)\n3. Register/Join\n4. My Status\n5. Request Support\n0. Back";
+                $response .= "One Man, One Shilling, One Healthy Roysambu\n\n";
+                $response .= "1. Benefits Info\n";
+                $response .= "2. Contribution (Ksh 1)\n";
+                $response .= "3. Register\n";
+                $response .= "4. My Status\n";
+                $response .= "5. Request Support\n";
+                $response .= "0. Back";
             } elseif ($level == 3) {
                 $healthChoice = $details[2];
+
                 if ($healthChoice == "1") {
-                    $response = "CON RoysAfya Benefits:\n* Medical & Maternal\n* Accident Coverage\n* Funeral Support\n\n0. Back";
+                    $response = "CON RoysAfya Benefits\n";
+                    $response .= "* Medical & Maternal\n";
+                    $response .= "* Accident Coverage\n";
+                    $response .= "* Funeral Support\n\n";
+                    $response .= "1. More\n0. Back";
                 } elseif ($healthChoice == "3") {
-                    $response = "CON Please enter your full name to Register/Join RoysAfya Care:";
-                } else {
-                    $response = "END This service will be available soon. Thank you!\n0. Back";
+                    $response = "CON Please enter your full name:";
                 }
-            } elseif ($level == 4 && $details[2] == "3") {
-                $name = end($details);
+                // --- ADDED THIS SECTION HERE ---
+                elseif ($healthChoice == "5") {
+                    $response = "CON 1. Medical/Maternal\n";
+                    $response .= "2. Accident/Emergency\n";
+                    $response .= "3. Family Shopping (Breadwinner Ill)\n";
+                    $response .= "4. Funeral Support\n";
+                    $response .= "5. Back";
+                } else {
+                    $response = "CON Coming soon.\n0. Back";
+                }
+            } elseif ($level == 4) {
+                $healthChoice = $details[2];
+                $input = end($details);
 
-                // If name is empty, we just call them "supporter" or "voter"
-                $displayName = empty($name) ? "valued supporter" : $name;
+                if ($healthChoice == "1" && $input == "1") {
+                    $response = "CON Hospital Shopping: 1 month food supply if breadwinner is admitted\n\n0. Back";
+                }
+                // --- ADDED THIS SECTION TO HANDLE THE SUPPORT CHOICE ---
+                elseif ($healthChoice == "5") {
+                    // User picked a support category (1, 2, 3, or 4)
+                    if ($input == "5") {
+                        // Logic for "5. Back" - sends them back to the Health Menu
+                        $response = "CON Welcome to RoysAfya Care\n";
+                        $response .= "1. Benefits Info\n2. Contribution (Ksh 1)\n3. Register\n4. My Status\n5. Request Support\n0. Back";
+                    } else {
+                        $response = "CON Please enter your ID number or location for follow-up:";
+                    }
+                } elseif ($healthChoice == "3") {
+                    $name = $input;
+                    $displayName = empty($name) ? "valued supporter" : $name;
 
-                Voter::updateOrCreate(
-                    ['phone' => $phoneNumber],
-                    [
-                        'name' => $name, // Saves as null or empty string
-                        'session_id' => $request->input('sessionId')
-                    ]
-                );
+                    Voter::updateOrCreate(
+                        ['phone' => $phoneNumber],
+                        ['name' => $name, 'session_id' => $sessionId]
+                    );
 
-                $response = "END Thank you $displayName! You have successfully registered.";
+                    $response = "END Thank you $displayName! Registered successfully.";
+                }
             }
         }
 
-        // --- SMART CATCH-ALL (Cost-Saving) ---
+        // Catch-all
         else {
-            // Instead of END, we show the Main Menu with an error
-            $response = "CON Invalid selection. Please try again:\n";
-            $response .= "1. Education\n2. Health";
+            $response = "CON Invalid selection.\n1. Education\n2. Health";
         }
 
         return response($response)->header('Content-Type', 'text/plain');
