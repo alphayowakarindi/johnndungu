@@ -7,8 +7,8 @@ import { User, Phone, Calendar, Clock, Users } from 'lucide-react';
 export default function Dashboard({ voters }) {
     // CRITICAL: Extract the array and meta-data from the pagination object
     const memberList = voters.data || [];
-    const meta = voters.meta || { total: 0 };
-    const links = voters.meta?.links || [];
+    // const meta = voters.meta || { total: 0 };
+    // const links = voters.meta?.links || [];
 
     return (
         <>
@@ -26,7 +26,7 @@ export default function Dashboard({ voters }) {
                         </div>
                         <div className="pr-2 md:pr-4">
                             <p className="text-[10px] uppercase font-bold text-slate-400">Total Members</p>
-                            <p className="text-lg md:text-xl font-black text-slate-800 dark:text-slate-200">{meta.total}</p>
+                            <p className="text-lg md:text-xl font-black text-slate-800 dark:text-slate-200">{voters.total}</p>
                         </div>
                     </div>
                 </div>
