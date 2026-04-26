@@ -77,7 +77,7 @@ export default function Dashboard({ voters }) {
                             <tr className="bg-slate-50/50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800">
                                 <th className="px-6 py-5 text-xs font-black uppercase text-slate-400 tracking-widest">Member</th>
                                 <th className="px-6 py-5 text-xs font-black uppercase text-slate-400 tracking-widest">Contact</th>
-                                <th className="px-6 py-5 text-xs font-black uppercase text-slate-400 tracking-widest text-right">Registration</th>
+                                <th className="px-6 py-5 text-xs font-black uppercase text-slate-400 tracking-widest text-right">Registered</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-50 dark:divide-slate-800">
