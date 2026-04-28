@@ -189,15 +189,15 @@ class UssdController extends Controller
                     $wardName     = $wardMap[$wardChoice]         ?? "Unknown";
 
                     // Save or update the applicant record
-                    Voter::updateOrCreate(
-                        ['phone' => $phoneNumber],
-                        [
-                            'national_id' => $nationalId,
-                            'category'    => $categoryName,
-                            'ward'        => $wardName,
-                            'session_id'  => $sessionId,
-                        ]
-                    );
+                    // Voter::updateOrCreate(
+                    //     ['phone' => $phoneNumber],
+                    //     [
+                    //         'national_id' => $nationalId,
+                    //         'category'    => $categoryName,
+                    //         'ward'        => $wardName,
+                    //         'session_id'  => $sessionId,
+                    //     ]
+                    // );
 
                     // CON instead of END — session stays alive
                     $response  = "CON Thank you. Your basic details are saved.\n\n";
