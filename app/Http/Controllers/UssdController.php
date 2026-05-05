@@ -61,7 +61,7 @@ class UssdController extends Controller
         // =======================================================
         if ($level == 0) {
             $response  = "CON Welcome, my name is John Ndung'u Kamau, a young aspiring MP for Roysambu. Let's go digital!\n\n";
-            $response .= "Ni JONTEH FRESH na IDEAS FRESH za Roysambu Fresh.\n\n";
+            $response .= "John Ndung'u ni kijana FRESH na IDEAS FRESH za Roysambu Fresh.\n\n";
             $response .= "1. Next";
         }
 
@@ -131,7 +131,7 @@ class UssdController extends Controller
                 $response .= "1. Secondary School\n";
                 $response .= "2. University/College\n";
                 $response .= "3. Vocational/TVET\n";
-                $response .= "4. Special Needs\n";
+                $response .= "4. PWD (Persons With Disabilities)\n";
                 $response .= "0. Back\n";
                 $response .= "00. Home";
             }
@@ -175,7 +175,7 @@ class UssdController extends Controller
                         "1" => "Secondary School",
                         "2" => "University/College",
                         "3" => "Vocational/TVET",
-                        "4" => "Special Needs",
+                        "4" => "PWD (Persons With Disabilities)",
                     ];
                     $wardMap = [
                         "1" => "Githurai",
@@ -290,7 +290,10 @@ class UssdController extends Controller
 
                     Voter::updateOrCreate(
                         ['phone' => $phoneNumber],
-                        ['name' => $name, 'session_id' => $sessionId]
+                        [
+                            'name' => $name,
+                            'session_id' => $sessionId
+                        ]
                     );
 
                     // CON instead of END — session stays alive
