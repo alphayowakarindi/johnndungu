@@ -60,7 +60,7 @@ class UssdController extends Controller
         // (No Home/Back here — this is the very first screen)
         // =======================================================
         if ($level == 0) {
-            $response  = "CON Welcome, my name is John Ndung'u Kamau, a young aspiring MP for Roysambu. Let's go digital!\n\n";
+            $response  = "CON Welcome, my name is John Ndung'u, a young aspiring MP for Roysambu. Let's go digital!\n\n";
             $response .= "John Ndung'u ni kijana FRESH na IDEAS FRESH za Roysambu Fresh.\n\n";
             $response .= "1. Next";
         }
